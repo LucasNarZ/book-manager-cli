@@ -1,7 +1,9 @@
 package ui;
 
 import domain.Book;
+import domain.User;
 import services.BookService;
+import services.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,9 +11,11 @@ import java.util.Scanner;
 
 public class Menu {
     private final BookService bookService;
+    private final UserService userService;
 
-    public Menu(BookService bookService) {
+    public Menu(BookService bookService, UserService userService) {
         this.bookService = bookService;
+        this.userService = userService;
     }
 
     public void begin() {
@@ -19,73 +23,128 @@ public class Menu {
         boolean running = true;
 
         System.out.println("Seja bem-vindo!");
+
         while (running) {
+            System.out.println();
             System.out.println("O que vc quer fazer?");
             System.out.println("1. Adicionar livro");
             System.out.println("2. Ver todos os livros");
             System.out.println("3. Buscar livro por id");
             System.out.println("4. Excluir livro por id");
             System.out.println("5. Buscar livros por título");
+            System.out.println("6. Adicionar usuário");
+            System.out.println("7. Ver todos os usuários");
+            System.out.println("8. Buscar usuário por id");
+            System.out.println("9. Excluir usuário por id");
             System.out.println("10. Sair");
 
-            int resposta = scanner.nextInt();
-            scanner.nextLine();
+            int resposta = Integer.parseInt(scanner.nextLine());
 
-            switch (resposta) {
-                case 1:
-                    System.out.println("Digite o título:");
-                    String title = scanner.nextLine();
-                    System.out.println("Digite o autor:");
-                    String author = scanner.nextLine();
-                    Book createdBook = this.bookService.createBook(title, author);
+            try {
+                switch (resposta) {
+                    case 1:
+                        System.out.println("Digite o título:");
+                        String title = scanner.nextLine();
 
-                    System.out.println("Livro adicionado");
-                    printBook(createdBook);
-                    break;
-                case 2:
-                    List<Book> books = this.bookService.findAll();
-                    printBooks(books);
+                        System.out.println("Digite o autor:");
+                        String author = scanner.nextLine();
 
-                    break;
-                case 3:
-                    System.out.println("Digite o id do livro desajado:");
-                    int id = scanner.nextInt();
-                    scanner.nextLine();
+                        Book createdBook = bookService.createBook(title, author);
 
-                    Optional<Book> bookOptional = this.bookService.findById(id);
+                        System.out.println("Livro adicionado");
+                        printBook(createdBook);
+                        break;
 
-                    if(bookOptional.isPresent()) {
-                        Book book = bookOptional.get();
-                        System.out.println("Livro encontrado:");
-                        printBook(book);
-                    }else {
-                        System.out.println("Livro não encontrado");
-                    }
+                    case 2:
+                        List<Book> books = bookService.findAll();
+                        printBooks(books);
+                        break;
 
-                    break;
-                case 4:
-                    System.out.println("Digite o id do livro desajado:");
-                    int idToDelete = scanner.nextInt();
-                    scanner.nextLine();
+                    case 3:
+                        System.out.println("Digite o id do livro desejado:");
+                        long bookId = Long.parseLong(scanner.nextLine());
 
-                    this.bookService.deleteBook(idToDelete);
+                        Optional<Book> bookOptional = bookService.findById(bookId);
 
-                    System.out.println("Livro excluído");
-                    break;
-                case 5:
-                    System.out.println("Digite o título para buscar:");
-                    String titleToSearch = scanner.nextLine();
+                        if (bookOptional.isPresent()) {
+                            System.out.println("Livro encontrado:");
+                            printBook(bookOptional.get());
+                        } else {
+                            System.out.println("Livro não encontrado");
+                        }
 
-                    List<Book> bookList = bookService.findByTitle(titleToSearch);
+                        break;
 
-                    printBooks(bookList);
+                    case 4:
+                        System.out.println("Digite o id do livro desejado:");
+                        long bookIdToDelete = Long.parseLong(scanner.nextLine());
 
-                case 10:
-                    running = false;
-                    break;
-                default:
-                    System.out.println("Opção inválida");
-                    break;
+                        bookService.deleteBook(bookIdToDelete);
+
+                        System.out.println("Livro excluído");
+                        break;
+
+                    case 5:
+                        System.out.println("Digite o título para buscar:");
+                        String titleToSearch = scanner.nextLine();
+
+                        List<Book> bookList = bookService.findByTitle(titleToSearch);
+
+                        printBooks(bookList);
+                        break;
+
+                    case 6:
+                        System.out.println("Digite o nome:");
+                        String name = scanner.nextLine();
+
+                        System.out.println("Digite o email:");
+                        String email = scanner.nextLine();
+
+                        User createdUser = userService.createUser(name, email);
+
+                        System.out.println("Usuário adicionado");
+                        printUser(createdUser);
+                        break;
+
+                    case 7:
+                        List<User> users = userService.findAll();
+                        printUsers(users);
+                        break;
+
+                    case 8:
+                        System.out.println("Digite o id do usuário desejado:");
+                        long userId = Long.parseLong(scanner.nextLine());
+
+                        Optional<User> userOptional = userService.findById(userId);
+
+                        if (userOptional.isPresent()) {
+                            System.out.println("Usuário encontrado:");
+                            printUser(userOptional.get());
+                        } else {
+                            System.out.println("Usuário não encontrado");
+                        }
+
+                        break;
+
+                    case 9:
+                        System.out.println("Digite o id do usuário desejado:");
+                        long userIdToDelete = Long.parseLong(scanner.nextLine());
+
+                        userService.deleteUser(userIdToDelete);
+
+                        System.out.println("Usuário excluído");
+                        break;
+
+                    case 10:
+                        running = false;
+                        break;
+
+                    default:
+                        System.out.println("Opção inválida");
+                        break;
+                }
+            } catch (Exception exception) {
+                System.out.println("Erro: " + exception.getMessage());
             }
         }
 
@@ -93,12 +152,44 @@ public class Menu {
     }
 
     private void printBook(Book book) {
-        System.out.println("id: " + book.getId() + ", titulo: " +  book.getTitle() + ", autor: " + book.getAuthor());
+        System.out.println(
+                "id: %d, titulo: %s, autor: %s".formatted(
+                        book.getId(),
+                        book.getTitle(),
+                        book.getAuthor()
+                )
+        );
     }
 
     private void printBooks(List<Book> books) {
-        for(Book book: books) {
+        if (books.isEmpty()) {
+            System.out.println("Nenhum livro encontrado.");
+            return;
+        }
+
+        for (Book book : books) {
             printBook(book);
+        }
+    }
+
+    private void printUser(User user) {
+        System.out.println(
+                "id: %d, nome: %s, email: %s".formatted(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                )
+        );
+    }
+
+    private void printUsers(List<User> users) {
+        if (users.isEmpty()) {
+            System.out.println("Nenhum usuário encontrado.");
+            return;
+        }
+
+        for (User user : users) {
+            printUser(user);
         }
     }
 }
