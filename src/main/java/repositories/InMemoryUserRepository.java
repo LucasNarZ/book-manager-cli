@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class InMemoryUserRepository {
-    private ArrayList<User> userList;
+public class InMemoryUserRepository implements UserRepository {
+    private final ArrayList<User> userList = new ArrayList<>();
     private long userIndex = 0;
 
 
@@ -26,7 +26,7 @@ public class InMemoryUserRepository {
     }
 
     public List<User> findAll() {
-        return userList;
+        return new ArrayList<>(userList);
     }
 
     public void deleteById(long id) {
