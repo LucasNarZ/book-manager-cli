@@ -30,7 +30,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     public void deleteById(long id) {
-        userList.remove(id);
+        userList.removeIf(user -> user.getId() == id);
     }
 
     public boolean existsByEmail(Email email){
