@@ -17,4 +17,8 @@ public interface BookRepository {
     public boolean existsByTitleAndAuthor(String title, String author);
 
     public List<Book> findByTitle(String title);
+
+    public void borrowBook(long bookId);
+
+    public void giveBookBack(long bookId);
 }

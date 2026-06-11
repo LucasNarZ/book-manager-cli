@@ -1,6 +1,7 @@
 package repositories;
 
 import domain.Book;
+import exceptions.BookNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,29 @@ public class InMemoryBookRepository implements BookRepository {
 
     public List<Book> findByTitle(String title) {
         return books.stream().filter(book -> book.getTitle().equals(title)).toList();
+    }
+
+    public void borrowBook(long bookId) throws BookNotFoundException {
+        Optional<Book> bookToBorrow = getBookById(bookId);
+
+        bookToBorrow.get().borrow();
+    }
+
+    public void giveBookBack(long bookId) {
+        Optional<Book> bookToBorrow = getBookById(bookId);
+
+        bookToBorrow.get().giveBack();
+    }
+
+    private Optional<Book> getBookById(long bookId) {
+        Optional<Book> bookToBorrow = books.stream()
+                .filter(book -> book.getId() == bookId)
+                .findFirst();
+
+        if (bookToBorrow.isEmpty()) {
+            throw  new BookNotFoundException();
+        }
+        return bookToBorrow;
     }
 
 }
