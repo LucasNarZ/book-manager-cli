@@ -24,9 +24,6 @@ public class Loan {
         return LocalDate.now().isAfter(getExpirationDate());
     }
 
-    public long getId() {
-        return id;
-    }
 
     public long getUserId() {
         return userId;
