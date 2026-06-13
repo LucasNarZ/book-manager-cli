@@ -3,6 +3,7 @@ package services;
 import domain.Book;
 import domain.Loan;
 import domain.User;
+import exceptions.BookNotFoundException;
 import exceptions.LoanNotFoundException;
 import exceptions.UserNotFoundException;
 import repositories.BookRepository;
@@ -32,6 +33,9 @@ public class LoanService {
 
         Optional<Book> book = bookRepository.findById(bookId);
 
+        if(book.isEmpty()) {
+            throw new BookNotFoundException();
+        }
 
         bookRepository.borrowBook(bookId);
 

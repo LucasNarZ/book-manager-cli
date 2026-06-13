@@ -1,10 +1,13 @@
 package ui;
 
 import domain.Book;
+import domain.Loan;
 import domain.User;
 import services.BookService;
+import services.LoanService;
 import services.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -12,10 +15,12 @@ import java.util.Scanner;
 public class Menu {
     private final BookService bookService;
     private final UserService userService;
+    private final LoanService loanService;
 
-    public Menu(BookService bookService, UserService userService) {
+    public Menu(BookService bookService, UserService userService, LoanService loanService) {
         this.bookService = bookService;
         this.userService = userService;
+        this.loanService = loanService;
     }
 
     public void begin() {
@@ -36,7 +41,9 @@ public class Menu {
             System.out.println("7. Ver todos os usuários");
             System.out.println("8. Buscar usuário por id");
             System.out.println("9. Excluir usuário por id");
-            System.out.println("10. Sair");
+            System.out.println("10. Emprestar livro");
+            System.out.println("11. Devolver livro");
+            System.out.println("12. Sair");
 
             int resposta = Integer.parseInt(scanner.nextLine());
 
@@ -136,6 +143,31 @@ public class Menu {
                         break;
 
                     case 10:
+                        System.out.println("Digite o id do usuário:");
+                        long userIdToBorrow = Long.parseLong(scanner.nextLine());
+
+                        System.out.println("Digite o id do livro:");
+                        long bookIdToBorrow = Long.parseLong(scanner.nextLine());
+
+                        System.out.println("Digite a data de vencimento (AAAA-MM-DD):");
+                        LocalDate expirationDate = LocalDate.parse(scanner.nextLine());
+
+                        Loan loan = loanService.borrowBook(userIdToBorrow, bookIdToBorrow, expirationDate);
+
+                        System.out.println("Livro emprestado");
+                        printLoan(loan);
+                        break;
+
+                    case 11:
+                        System.out.println("Digite o id do livro:");
+                        long bookIdToReturn = Long.parseLong(scanner.nextLine());
+
+                        loanService.returnBook(bookIdToReturn);
+
+                        System.out.println("Livro devolvido");
+                        break;
+
+                    case 12:
                         running = false;
                         break;
 
@@ -191,5 +223,14 @@ public class Menu {
         for (User user : users) {
             printUser(user);
         }
+    }
+
+    private void printLoan(Loan loan) {
+        System.out.println(
+                "id do usuário: %d, id do livro: %d".formatted(
+                        loan.getUserId(),
+                        loan.getBookId()
+                )
+        );
     }
 }
